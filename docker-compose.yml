@@ -1,0 +1,43 @@
+version: '3'
+services:
+#   postgresql:
+#     image: ${POSTGRESQL_IMAGE}:${POSTGRESQL_VERSION}
+#     container_name: postgresql
+#     networks:
+#       - container-network
+#     ports:
+#       - '5432:5432'
+#     hostname: postgresql
+#     environment:
+#       - POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME}
+#       - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+#       - POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE}
+#     volumes:
+#       - /tmp/postgresql-volume/conf/:/bitnami/postgresql/conf/
+  rabbitmq:
+    image: ${RABBITMQ_IMAGE}:${RABBITMQ_VERSION}
+    networks:
+      - container-network
+    hostname: rabbitmq
+    ports:
+      - '4369:4369'
+      - '5672:5672'
+      - '25672:25672'
+      - '15672:15672'
+    volumes:
+      - 'rabbitmq_data:/bitnami'
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+
+networks:
+  container-network:
+    driver: bridge
+
+volumes:
+#   postgresql-volume:
+#     driver: local
+  rabbitmq_data:
+    driver: local

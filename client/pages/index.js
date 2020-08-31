@@ -1,62 +1,84 @@
 import Head from 'next/head'
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import useSWR from 'swr'
+
+const fetcher = async (url) => {
+  const res = await fetch(url)
+  const data = await res.json()
+
+  if (res.status !== 200) {
+    throw new Error(data.message)
+  }
+  return data
+}
 
 export default function Home() {
+  const name = 'AhriNyan'
+
+  const [input, setInput] = useState('')
+  const [shouldSubscribe, setShouldSubscribe] = React.useState(false);
+
+  const { data } = useSWR(() => shouldSubscribe ? `/api/subscribe/${input}` : null, fetcher);
+
+  function handleClick() {
+    console.log("shouldSubscribe: ", shouldSubscribe)
+    setShouldSubscribe(true);
+  }
+
+  console.log(data)
+
+  // const subscribe = async (e) => {
+  //   e.preventDefault()
+  //   try {
+  //     const { data, error } = useSWR(
+  //       () => `/api/subscribe/${input}`,
+  //       fetcher
+  //     )
+
+  //     console.log(data)
+  //   } catch(err) {
+  //     alert(err)
+  //   }
+  // }
+
   return (
     <div className="container">
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>SEV</title>
       </Head>
 
       <main>
         <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          <span>StreamerEventViewer</span>
         </h1>
 
         <p className="description">
-          Get started by editing <code>pages/index.js</code>
+          <a href="http://localhost:8080/login">
+            Login with your <code>Twitch</code> account
+          </a>
         </p>
 
         <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="card"
+          <Link
+            href="/streamer/[name]"
+            as={`/streamer/AhriNyan`}
           >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+            <a>
+              <h3>Watch your favourite streamer</h3>
+              <p>
+                Watch live stream of your favourite streamer with chat and recent events.
+              </p>
+            </a>
+          </Link>
+          <div className='flex'>
+            <input className='bg-gray-200 shadow-inner rounded-l p-2 flex-1' id='name' type='input' aria-label='streamer name' placeholder='Enter your favourite streamer' value={input} onChange={e => setInput(e.target.value)} />
+            <button disable={shouldSubscribe} onClick={handleClick}>Fetch</button>
+          </div>
         </div>
       </main>
 
       <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
       </footer>
 
       <style jsx>{`
